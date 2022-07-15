@@ -3,41 +3,36 @@
   inputs.nixpkgs.url = "nixpkgs/nixos-21.11-small";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (system:
+  outputs = { nixpkgs, flake-utils, ... }: flake-utils.lib.eachDefaultSystem (system:
     let pkgs = nixpkgs.legacyPackages.${system}; in
     with pkgs; {
       devShell =
         let
           image-name = "WindowsVM.img";
-          image-size = "40G";
-          create = writeShellScriptBin "create-img" ''
-            qemu-img create -f qcow2 ${image-name} ${image-size}
+          create-img = writeShellScriptBin "create-img" ''
+            ${pkgs.qemu}/bin/qemu-img create -f qcow2 ${image-name} ''${IMAGE_SIZE:-40G}
           '';
-          boot = writeShellScriptBin "boot-img" ''
-            exec qemu-system-x86_64 -enable-kvm \
-              -cpu host \
-              -smp sockets=1,cores=4,threads=1 \
-              -drive file=${image-name},if=virtio \
-              -net nic -net user,hostname=windowsvm \
-              -m 2G \
-              -monitor stdio \
+          boot-img = writeShellScriptBin "boot-img" ''
+            ${pkgs.qemu}/bin/qemu-system-x86_64 \
               -name "Windows" \
-              -usb \
+              -display gtk \
+              -enable-kvm \
+              -cpu host \
+              -m 4G \
+              -smp 4 \
+              -drive file=${image-name},media=disk,if=virtio \
+              -nic user,model=virtio-net-pci \
               "$@"
           '';
-          init = writeShellScriptBin "init-img" ''
-            exec ${boot}/bin/boot-img \
+          init-img = writeShellScriptBin "init-img" ''
+            ${boot-img}/bin/boot-img \
               -boot d \
-              -drive file=WINDOWS.iso,media=cdrom \
-              -drive file=DRIVER.iso,media=cdrom
+              -cdrom ''${WINDOWS_ISO_FILE:-windows.iso} \
+              -drive file=''${VIRTIO_ISO_FILE:-virtio.iso},media=cdrom
           '';
         in
         mkShell {
-          buildInputs = [
-            boot
-            create
-            init
-          ];
+          buildInputs = [ boot-img create-img init-img ];
         };
     });
 }
