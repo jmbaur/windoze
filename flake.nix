@@ -16,6 +16,7 @@
             ${pkgs.qemu}/bin/qemu-system-x86_64 \
               -name "Windows" \
               -display gtk \
+              -monitor stdio \
               -enable-kvm \
               -cpu host \
               -m 4G \
