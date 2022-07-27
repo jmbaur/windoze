@@ -10,6 +10,7 @@ virtio_iso=${WINDOZE_VIRTIO_ISO_LOCATION:-~/Downloads/virtio.iso}
 run_args=(
 	-name "windoze"
 	-display gtk
+	-usb -device usb-tablet
 	-monitor stdio
 	-enable-kvm
 	-cpu host
