@@ -9,7 +9,7 @@
 ## Configuration
 
 ### $WINDOZE_DISK_LOCATION
-	default: ~/windoze.qcow2
+	default: ~/Documents/windoze.qcow2
 
 ### $WINDOZE_DISK_SIZE
 	default: 50G
