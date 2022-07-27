@@ -24,6 +24,13 @@
         windoze = pkgs.windoze;
         default = self.packages.${system}.windoze;
       };
+      apps = {
+        windoze = flake-utils.lib.mkApp {
+          drv = self.packages.${system}.windoze;
+          name = "windoze";
+        };
+        default = self.apps.${system}.windoze;
+      };
       devShells.default = pkgs.mkShell {
         buildInputs = [ self.packages.${system}.default ];
         # Put the disk image in the current directory for development.
