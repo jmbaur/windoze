@@ -1,12 +1,13 @@
 {
   description = "windoze";
-
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
-
-  outputs = inputs: with inputs; {
+  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+  outputs = inputs: with inputs; let
+    forAllSystems = cb: nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (system: cb {
+      inherit system;
+      pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.default ]; };
+    });
+  in
+  {
     overlays.default = final: prev: {
       windoze = prev.writeShellApplication {
         name = "windoze";
@@ -14,27 +15,7 @@
         text = builtins.readFile ./windoze.bash;
       };
     };
-  } //
-  flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
-    let pkgs = import nixpkgs {
-      inherit system; overlays = [ self.overlays.default ];
-    }; in
-    {
-      packages = {
-        windoze = pkgs.windoze;
-        default = self.packages.${system}.windoze;
-      };
-      apps = {
-        windoze = flake-utils.lib.mkApp {
-          drv = self.packages.${system}.windoze;
-          name = "windoze";
-        };
-        default = self.apps.${system}.windoze;
-      };
-      devShells.default = pkgs.mkShell {
-        buildInputs = [ self.packages.${system}.default ];
-        # Put the disk image in the current directory for development.
-        WINDOZE_DISK_LOCATION = "windoze.qcow2";
-      };
-    });
+    packages = forAllSystems ({ pkgs, ... }: { default = pkgs.windoze; });
+    apps = forAllSystems ({ pkgs, ... }: { default = { type = "app"; program = "${pkgs.windoze}/bin/windoze"; }; });
+  };
 }

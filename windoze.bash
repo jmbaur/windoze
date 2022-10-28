@@ -46,22 +46,22 @@ EOF
 fi
 
 case ${1:-} in
-	create)
-		exec -a "$0" qemu-img create -f qcow2 "$image_name" "$image_size" "${@:2}"
-		;;
-	init)
-		run_args+=(
-			-boot d
-			-cdrom "$os_iso"
-			-drive "file=${virtio_iso},media=cdrom"
-		)
-		exec -a "$0" qemu-kvm "${run_args[@]}" "${@:2}"
-		;;
-	run)
-		exec -a "$0" qemu-kvm "${run_args[@]}" "${@:2}"
-		;;
-	*)
-		usage
-		exit 1
-		;;
+create)
+	exec -a "$0" qemu-img create -f qcow2 "$image_name" "$image_size" "${@:2}"
+	;;
+init)
+	run_args+=(
+		-boot d
+		-cdrom "$os_iso"
+		-drive "file=${virtio_iso},media=cdrom"
+	)
+	exec -a "$0" qemu-kvm "${run_args[@]}" "${@:2}"
+	;;
+run)
+	exec -a "$0" qemu-kvm "${run_args[@]}" "${@:2}"
+	;;
+*)
+	usage
+	exit 1
+	;;
 esac
