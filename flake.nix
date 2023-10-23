@@ -2,7 +2,7 @@
   description = "windoze";
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   outputs = inputs: with inputs; let
-    forAllSystems = cb: nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (system: cb {
+    forAllSystems = f: nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (system: f {
       inherit system;
       pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.default ]; };
     });
@@ -15,7 +15,6 @@
         text = builtins.readFile ./windoze.bash;
       };
     };
-    packages = forAllSystems ({ pkgs, ... }: { default = pkgs.windoze; });
-    apps = forAllSystems ({ pkgs, ... }: { default = { type = "app"; program = "${pkgs.windoze}/bin/windoze"; }; });
+    legacyPackages = forAllSystems ({ pkgs, ... }: pkgs);
   };
 }
