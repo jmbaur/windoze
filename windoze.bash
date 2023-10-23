@@ -5,7 +5,6 @@ image_size=${WINDOZE_DISK_SIZE:-50G}
 memory=${WINDOZE_MEM:-4G}
 cpu=${WINDOZE_CPU:-2}
 os_iso=${WINDOZE_OS_ISO_LOCATION:-~/Downloads/windows.iso}
-virtio_iso=${WINDOZE_VIRTIO_ISO_LOCATION:-~/Downloads/virtio.iso}
 
 run_args=(
 	-name "windoze"
@@ -53,7 +52,7 @@ init)
 	run_args+=(
 		-boot d
 		-cdrom "$os_iso"
-		-drive "file=${virtio_iso},media=cdrom"
+		-drive "file=@virtioIso@/iso/virtio-win.iso,media=cdrom"
 	)
 	exec -a "$0" qemu-kvm "${run_args[@]}" "${@:2}"
 	;;

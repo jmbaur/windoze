@@ -1,10 +1,7 @@
 # Helper script for creating and booting a Windows VM
 
-## Building
-`nix build`
-
 ## Running
-`nix run`
+`nix run .#windoze`
 
 ## Configuration
 
@@ -22,6 +19,3 @@
 
 ### $WINDOZE_OS_ISO_LOCATION (only needed for VM initialization)
 	default: ~/Downloads/windows.iso
-
-### $WINDOZE_VIRTIO_ISO_LOCATION (only needed for VM initialization)
-	default: ~/Downloads/virtio.iso
